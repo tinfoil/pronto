@@ -1,3 +1,4 @@
+require 'zlib' # Temporarily require before rugged to fix https://github.com/prontolabs/pronto/issues/23
 require 'rugged'
 require 'octokit'
 require 'gitlab'
