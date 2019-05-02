@@ -262,11 +262,13 @@ Currently available:
 
 * [pronto-blacklist](https://github.com/pbstriker38/pronto-blacklist)
 * [pronto-brakeman](https://github.com/prontolabs/pronto-brakeman)
+* [pronto-bundler_audit](https://github.com/pdobb/pronto-bundler_audit)
 * [pronto-coffeelint](https://github.com/siebertm/pronto-coffeelint)
 * [pronto-clang_format](https://github.com/micjabbour/pronto-clang_format)
 * [pronto-clang_tidy](https://github.com/micjabbour/pronto-clang_tidy)
 * [pronto-clippy](https://github.com/hauleth/pronto-clippy)
 * [pronto-credo](https://github.com/carakan/pronto-credo)
+* [pronto-dialyxir](https://github.com/Apelsinka223/pronto-dialyxir)
 * [pronto-dialyzer](https://github.com/iurifq/pronto-dialyzer)
 * [pronto-dirty_words](https://github.com/kevinjalbert/pronto-dirty_words)
 * [pronto-dogma](https://github.com/iurifq/pronto-dogma)
