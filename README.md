@@ -138,6 +138,12 @@ Use `GithubStatusFormatter` to submit [commit status](https://github.com/blog/12
 $ PRONTO_GITHUB_ACCESS_TOKEN=token pronto run -f github_status -c origin/master
 ```
 
+If you want to show a one single status for all runners, instead of status per runner:
+
+```sh
+$ PRONTO_GITHUB_ACCESS_TOKEN=token pronto run -f github_combined_status -c origin/master
+```
+
 It's possible to combine multiple formatters.
 To get both pull request comments and commit status summary use:
 
@@ -156,6 +162,36 @@ formatters = [formatter, status_formatter]
 Pronto.run('origin/master', '.', formatters)
 ```
 
+#### GitHub Actions Integration
+
+You can also run Pronto as a GitHub action. 
+
+Here's an example `.github/workflows/pronto.yml` workflow file using the `github_status` and `github_pr` formatters and running on each GitHub PR, with `pronto-rubocop` as the runner:
+
+
+```yml
+name: Pronto
+on: [pull_request]
+
+jobs:
+  pronto:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - run: |
+          git fetch --no-tags --prune --depth=10 origin +refs/heads/*:refs/remotes/origin/*
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+      - name: Setup pronto
+        run: gem install pronto pronto-rubocop
+      - name: Run Pronto
+        run: PRONTO_PULL_REQUEST_ID="$(jq --raw-output .number "$GITHUB_EVENT_PATH")" PRONTO_GITHUB_ACCESS_TOKEN="${{ github.token }}" pronto run -f github_status github_pr -c origin/${{ github.base_ref }}
+```
+check Wiki on [GitHub Actions Integration](https://github.com/prontolabs/pronto/wiki/GitHub-Actions-Integration) for more info.
+
 ### GitLab Integration
 
 You can run Pronto as a step of your CI builds and get the results as comments
@@ -173,6 +209,29 @@ Then just run it:
 
 ```sh
 $ PRONTO_GITLAB_API_PRIVATE_TOKEN=token pronto run -f gitlab -c origin/master
+```
+
+**note: this requires at least Gitlab 11.6+**
+
+Merge request integration:
+
+```sh
+$ PRONTO_GITLAB_API_PRIVATE_TOKEN=token PRONTO_PULL_REQUEST_ID=id pronto run -f gitlab_mr -c origin/master
+```
+
+On GitLabCI make make sure to run Pronto in a [merge request pipeline](https://docs.gitlab.com/ce/ci/merge_request_pipelines/):
+
+```sh
+lint:
+  image: ruby
+  variables:
+    PRONTO_GITLAB_API_ENDPOINT: "https://gitlab.com/api/v4"
+    PRONTO_GITLAB_API_PRIVATE_TOKEN: token
+  only:
+    - merge_requests
+  script:
+    - bundle install
+    - bundle exec pronto run -f gitlab_mr -c origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME
 ```
 
 ### Bitbucket Integration
@@ -277,6 +336,7 @@ The following values are available only to the text formatter:
 Pronto can run various tools and libraries, as long as there's a runner for it.
 Currently available:
 
+* [pronto-bigfiles](https://github.com/apiology/pronto-bigfiles)
 * [pronto-blacklist](https://github.com/pbstriker38/pronto-blacklist)
 * [pronto-brakeman](https://github.com/prontolabs/pronto-brakeman)
 * [pronto-bundler_audit](https://github.com/pdobb/pronto-bundler_audit)
@@ -302,6 +362,7 @@ Currently available:
 * [pronto-goodcheck](https://github.com/aergonaut/pronto-goodcheck)
 * [pronto-haml](https://github.com/prontolabs/pronto-haml)
 * [pronto-hlint](https://github.com/fretlink/pronto-hlint/) (uses Haskell code suggestions [hlint](https://github.com/ndmitchell/hlint))
+* [pronto-infer](https://github.com/seikichi/pronto-infer)
 * [pronto-inspec](https://github.com/stiller-leser/pronto-inspec)
 * [pronto-jscs](https://github.com/spajus/pronto-jscs)
 * [pronto-jshint](https://github.com/prontolabs/pronto-jshint)
@@ -312,7 +373,9 @@ Currently available:
 * [pronto-phpmd](https://github.com/EllisV/pronto-phpmd)
 * [pronto-phpstan](https://github.com/Powerhamster/pronto-phpstan)
 * [pronto-poper](https://github.com/prontolabs/pronto-poper)
+* [pronto-punchlist](https://github.com/apiology/pronto-punchlist)
 * [pronto-rails_best_practices](https://github.com/prontolabs/pronto-rails_best_practices)
+* [pronto-rails_data_schema](https://github.com/mbajur/pronto-rails_data_schema)
 * [pronto-rails_schema](https://github.com/raimondasv/pronto-rails_schema)
 * [pronto-reek](https://github.com/prontolabs/pronto-reek)
 * [pronto-rubocop](https://github.com/prontolabs/pronto-rubocop)
@@ -320,7 +383,9 @@ Currently available:
 * [pronto-shellcheck](https://github.com/pclalv/pronto-shellcheck)
 * [pronto-slim](https://github.com/nysthee/pronto-slim)
 * [pronto-slim_lint](https://github.com/ibrahima/pronto-slim_lint)
+* [pronto-sorbet](https://github.com/teamsimplepay/pronto-sorbet)
 * [pronto-spell](https://github.com/prontolabs/pronto-spell)
+* [pronto-standardrb](https://github.com/julianrubisch/pronto-standardrb)
 * [pronto-stylelint](https://github.com/kevinjalbert/pronto-stylelint)
 * [pronto-swiftlint](https://github.com/ajanauskas/pronto-swiftlint)
 * [pronto-tailor](https://github.com/ajanauskas/pronto-tailor)
@@ -328,6 +393,7 @@ Currently available:
 * [pronto-tslint_npm](https://github.com/eprislac/pronto-tslint_npm)
 * [pronto-yamllint](https://github.com/pauliusm/pronto-yamllint)
 * [pronto-undercover](https://github.com/grodowski/pronto-undercover)
+* [pronto-xmllint](https://github.com/pauliusm/pronto-xmllint)
 
 ## Articles
 
